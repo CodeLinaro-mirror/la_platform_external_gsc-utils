@@ -1,3 +1,5 @@
+include platform/system/core:main:/janitors/OWNERS
+
 apronin@google.com
 ecgh@google.com
 granaghan@google.com
