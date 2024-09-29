@@ -40,7 +40,7 @@ cc_binary {
     defaults: ["gsctool_defaults"],
     srcs: [
         "extra/usb_updater/*.c",
-        "util/usb_if.c"
+        "util/usb_if.c",
     ],
     local_include_dirs: [
         "extra/usb_updater",
