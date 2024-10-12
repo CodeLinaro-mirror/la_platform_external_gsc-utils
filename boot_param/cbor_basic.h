@@ -4,8 +4,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __GSC_UTILS_DICE_CBOR_BASIC_H
-#define __GSC_UTILS_DICE_CBOR_BASIC_H
+#ifndef __GSC_UTILS_BOOT_PARAM_CBOR_BASIC_H
+#define __GSC_UTILS_BOOT_PARAM_CBOR_BASIC_H
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -86,7 +86,7 @@ struct cbor_bstr1_s {
 #define CBOR_BSTR1_HDR CBOR_HDR1(CBOR_MAJOR_BSTR, 1)
 #define CBOR_BSTR1_EMPTY { CBOR_BSTR1_HDR, 0 }
 
-/* BSTR of length 32: UDS, CDI, digest */
+/* BSTR of length 32: UDS, CDI, digest, key seeds */
 struct cbor_bstr32_s {
 	uint8_t cbor_hdr[2];
 	uint8_t value[32];
@@ -121,7 +121,7 @@ struct cbor_tstr40_s {
 		}                               \
 	}
 
-/* BSTR of length 64: signature */
+/* BSTR of length 64: signature, entropy */
 struct cbor_bstr64_s {
 	uint8_t cbor_hdr[2];
 	uint8_t value[64];
@@ -160,4 +160,4 @@ struct cbor_uint32_s {
 } /* extern "C" */
 #endif
 
-#endif /* __CGSC_UTILS_DICE_CBOR_BASIC_H */
+#endif /* __CGSC_UTILS_BOOT_PARAM_CBOR_BASIC_H */
