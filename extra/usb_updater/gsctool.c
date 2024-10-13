@@ -632,7 +632,7 @@ static bool is_ti50_device(void)
 static FILE *tpm_output;
 static int ts_write(const void *out, size_t len)
 {
-	const char *cmd_head = "PATH=\"${PATH}:/usr/sbin\" "
+	const char *cmd_head = "PATH=\"${PATH}:/usr/sbin:/vendor/bin/hw\" "
 			       "${TRUNKS_SEND_BIN:-trunks_send} --raw ";
 	size_t head_size = strlen(cmd_head);
 	char full_command[head_size + 2 * len + 1];
@@ -3244,19 +3244,6 @@ static int process_get_apro_hash(struct transfer_descriptor *td)
 	return 0;
 }
 
-static int process_start_apro_verify(struct transfer_descriptor *td)
-{
-	int rv = 0;
-
-	rv = send_vendor_command(td, VENDOR_CC_AP_RO_VALIDATE, NULL, 0, NULL,
-				 NULL);
-	if (rv != VENDOR_RC_SUCCESS) {
-		fprintf(stderr, "Error %d starting RO verify\n", rv);
-		return update_error;
-	}
-	return 0;
-}
-
 static int process_get_apro_boot_status(struct transfer_descriptor *td)
 {
 	size_t response_size;
@@ -4242,6 +4229,27 @@ static int process_reboot_gsc(struct transfer_descriptor *td, size_t timeout_ms)
 	return 0;
 }
 
+static int process_start_apro_verify(struct transfer_descriptor *td)
+{
+	int rv = 0;
+
+	/*
+	 * For Ti50, we need to restart GSC to perform AP RO verification again.
+	 */
+	if (is_ti50_device())
+		return process_reboot_gsc(td, 1000);
+
+	/* If H1 chip, then send vendor command to start AP RO verification */
+	rv = send_vendor_command(td, VENDOR_CC_AP_RO_VALIDATE, NULL, 0, NULL,
+				 NULL);
+	if (rv != VENDOR_RC_SUCCESS) {
+		fprintf(stderr, "Error %d starting RO verify\n", rv);
+		return update_error;
+	}
+
+	return 0;
+}
+
 /*
  * Search the passed in zero terminated array of options_map structures for
  * option 'option'.
@@ -4740,6 +4748,7 @@ static struct get_chip_id_response get_chip_id_info(
  */
 static enum gsc_device determine_gsc_type(struct transfer_descriptor *td)
 {
+	int epoch;
 	int major;
 	struct get_chip_id_response chip_id;
 
@@ -4750,12 +4759,10 @@ static enum gsc_device determine_gsc_type(struct transfer_descriptor *td)
 	 * and shutting down of USB subsystem within gsctool (b/368631328).
 	 */
 	get_version(td, false);
+	epoch = targ.shv[1].epoch;
 	major = targ.shv[1].major;
-	if (targ.shv[1].epoch == 0 &&
-	    (major == 21 || major == 23 || major == 24)) {
+	if ((epoch == 0 || epoch == 1) && (major >= 21 && major <= 26))
 		return GSC_DEVICE_DT;
-	}
-
 	/*
 	 * Try the newer TPMV command. If the command isn't supported,
 	 * then the GSC should respond with an error. If that happens we will
