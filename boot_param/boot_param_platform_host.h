@@ -4,10 +4,10 @@
  * found in the LICENSE file.
  */
 
-#ifndef __GSC_UTILS_DICE_PLATFORM_HOST_H
-#define __GSC_UTILS_DICE_PLATFORM_HOST_H
+#ifndef __GSC_UTILS_BOOT_PARAM_PLATFORM_HOST_H
+#define __GSC_UTILS_BOOT_PARAM_PLATFORM_HOST_H
 
-#include "dice_types.h"
+#include "boot_param_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -19,4 +19,4 @@ extern struct dice_config_s g_dice_config;
 } /* extern "C" */
 #endif
 
-#endif /* __GSC_UTILS_DICE_PLATFORM_HOST_H */
+#endif /* __GSC_UTILS_BOOT_PARAM_PLATFORM_HOST_H */
