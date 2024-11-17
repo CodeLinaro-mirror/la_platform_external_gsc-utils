@@ -6,6 +6,13 @@ package {
     default_team: "trendy_team_desktop_hwsec",
 }
 
+team {
+    name: "trendy_team_desktop_hwsec",
+
+    // go/trendy/manage/engineers/5198716937273344
+    trendy_team_id: "5198716937273344",
+}
+
 cc_defaults {
     name: "gsctool_defaults",
     // cflags used are identical to those of extra/usb_updater/Makefile
