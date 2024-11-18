@@ -19,18 +19,17 @@ cc_library {
     ],
 }
 
-// Uncomment once we have a team to assign this test to.
-// cc_test_host {
-//     name: "libtpmgenerated_test",
-//     srcs: [
-//         "mock_authorization_delegate.cc",
-//         "mock_command_transceiver.cc",
-//         "tpm_generated_test.cc",
-//     ],
-//     shared_libs: [
-//         "libtpmgenerated",
-//     ],
-//     static_libs: [
-//         "libgmock",
-//     ],
-// }
+cc_test_host {
+    name: "libtpmgenerated_test",
+    srcs: [
+        "mock_authorization_delegate.cc",
+        "mock_command_transceiver.cc",
+        "tpm_generated_test.cc",
+    ],
+    shared_libs: [
+        "libtpmgenerated",
+    ],
+    static_libs: [
+        "libgmock",
+    ],
+}
