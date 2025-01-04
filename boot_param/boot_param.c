@@ -29,7 +29,8 @@ union header_options_s {
  * signature.
  */
 _Static_assert(
-	sizeof(struct combined_hdr_s) >= sizeof(struct cdi_sig_struct_hdr_s)
+	sizeof(struct combined_hdr_s) >= sizeof(struct cdi_sig_struct_hdr_s),
+	"combined_hdr_s < cdi_sig_struct_hdr_s"
 );
 
 struct dice_handover_s {
@@ -40,7 +41,8 @@ struct dice_handover_s {
 };
 _Static_assert(
 	sizeof(struct dice_handover_s) - sizeof(struct dice_handover_hdr_s) ==
-	DICE_CHAIN_SIZE
+	DICE_CHAIN_SIZE,
+	"dice_handover_s != dice_handover_hdr_s + DICE_CHAIN_SIZE"
 );
 
 /* BootParam = {
@@ -63,7 +65,10 @@ struct boot_param_s {
 	uint8_t dice_handover_label;
 	struct dice_handover_s dice_handover;
 };
-_Static_assert(sizeof(struct boot_param_s) == BOOT_PARAM_SIZE);
+_Static_assert(
+	sizeof(struct boot_param_s) == BOOT_PARAM_SIZE,
+	"boot_param_s != BOOT_PARAM_SIZE"
+);
 
 /* Context to pass between functions that build the DICE handover structure
  */
@@ -906,6 +911,7 @@ size_t get_boot_param_bytes(
 		return 0;
 
 	__platform_memcpy(dest, src + offset, size);
+	__platform_memset(&ctx, 0, sizeof(struct dice_ctx_s)); /* zeroize */
 	return size;
 }
 
@@ -935,5 +941,6 @@ size_t get_dice_chain_bytes(
 		return 0;
 
 	__platform_memcpy(dest, src + offset, size);
+	__platform_memset(&ctx, 0, sizeof(struct dice_ctx_s)); /* zeroize */
 	return size;
 }
