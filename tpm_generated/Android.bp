@@ -5,6 +5,24 @@
 // A library for generating TPM commands and parsing TPM responses. Derived from
 // the Chromium OS trunks daemon's TPM code.
 
+rust_library {
+    name: "libtpmclient",
+    crate_name: "tpmclient",
+    host_supported: true,
+    srcs: ["lib.rs"],
+    rustlibs: ["libcxx"],
+    shared_libs: ["libtpmgenerated"],
+}
+
+// cxxbridge generates C++ code that is included in libtpmgenerated.
+genrule {
+    name: "libtpmclient_bridge",
+    tools: ["cxxbridge"],
+    cmd: "$(location cxxbridge) $(in) > $(out)",
+    srcs: ["lib.rs"],
+    out: ["libtpmclient_cxx_generated.cc"],
+}
+
 cc_library {
     name: "libtpmgenerated",
     host_supported: true,
@@ -13,24 +31,27 @@ cc_library {
         "libcrypto",
     ],
     srcs: [
+        "ffi.cc",
         "hex.cc",
+        "password_authorization_delegate.cc",
         "secure_hash.cc",
         "tpm_generated.cc",
     ],
+    generated_headers: ["cxx-bridge-header"],
+    generated_sources: ["libtpmclient_bridge"],
 }
 
-// Uncomment once we have a team to assign this test to.
-// cc_test_host {
-//     name: "libtpmgenerated_test",
-//     srcs: [
-//         "mock_authorization_delegate.cc",
-//         "mock_command_transceiver.cc",
-//         "tpm_generated_test.cc",
-//     ],
-//     shared_libs: [
-//         "libtpmgenerated",
-//     ],
-//     static_libs: [
-//         "libgmock",
-//     ],
-// }
+cc_test_host {
+    name: "libtpmgenerated_test",
+    srcs: [
+        "mock_authorization_delegate.cc",
+        "mock_command_transceiver.cc",
+        "tpm_generated_test.cc",
+    ],
+    shared_libs: [
+        "libtpmgenerated",
+    ],
+    static_libs: [
+        "libgmock",
+    ],
+}
