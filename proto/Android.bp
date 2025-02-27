@@ -1,0 +1,10 @@
+// Copyright 2025 The ChromiumOS Authors
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+rust_protobuf {
+    name: "libgsc_utils_proto_rs",
+    crate_name: "gsc_utils_proto",
+    protos: ["attestation_ca.proto"],
+    source_stem: "gsc_utils_proto",
+}
