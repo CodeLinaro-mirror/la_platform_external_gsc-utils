@@ -5,6 +5,7 @@
 rust_protobuf {
     name: "libgsc_utils_proto_rs",
     crate_name: "gsc_utils_proto",
+    host_supported: true,
     protos: ["attestation_ca.proto"],
     source_stem: "gsc_utils_proto",
 }
