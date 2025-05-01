@@ -33,6 +33,7 @@ cc_library {
     srcs: [
         "ffi.cc",
         "hex.cc",
+        "hmac_authorization_delegate.cc",
         "multiple_authorization_delegate.cc",
         "password_authorization_delegate.cc",
         "secure_hash.cc",
