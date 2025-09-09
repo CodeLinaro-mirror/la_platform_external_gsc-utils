@@ -273,6 +273,23 @@ TPM_RC ParseResponse_FlushContext(
     const std::string& response,
     std::unique_ptr<AuthorizationDelegate>& authorization_delegate);
 
+// Wraps Tpm::SerializeCommand_GetCapability. Serializes the TPM2_GetCapability
+// command.
+// authorization_delegate is nullable.
+TPM_RC SerializeCommand_GetCapability(
+    const TPM_CAP& capability, const UINT32& property,
+    const UINT32& property_count, std::string& serialized_command,
+    std::unique_ptr<AuthorizationDelegate>& authorization_delegate);
+
+// Wraps Tpm::ParseResponse_GetCapability. Parses the response from a
+// TPM2_GetCapability command.
+// authorization_delegate is nullable.
+TPM_RC ParseResponse_GetCapability(
+    const std::string& response,
+    TPMI_YES_NO& more_data,
+    TPMS_CAPABILITY_DATA& capability_data,
+    std::unique_ptr<AuthorizationDelegate>& authorization_delegate);
+
 // -----------------------------------------------------------------------------
 // TPM_HANDLE
 // -----------------------------------------------------------------------------
@@ -355,6 +372,25 @@ std::unique_ptr<TPMT_SIG_SCHEME> Sha256EcdsaSigScheme();
 
 // Creates a new, empty TPMT_TK_CREATION.
 std::unique_ptr<TPMT_TK_CREATION> TPMT_TK_CREATION_New();
+
+// -----------------------------------------------------------------------------
+// TPMS_CAPABILITY_DATA
+// -----------------------------------------------------------------------------
+// Returns the maximum number of handles which can be returned in a single TPM call.
+UINT32 GetMaxCapHandles();
+
+// Returns the handles which reside in TPM volatile memory.
+std::array<UINT32, 3> GetVolatileMemoryHandleTypes();
+
+// Creates a new, empty TPMS_CAPABILITY_DATA.
+std::unique_ptr<TPMS_CAPABILITY_DATA> TPMS_CAPABILITY_DATA_New();
+
+// Returns the number of handles in a TPMS_CAPABILITY_DATA.
+UINT32 GetHandleCount(const TPMS_CAPABILITY_DATA& capability_data);
+
+// Returns the handle at a given index in a TPMS_CAPABILITY_DATA.
+TPM_HANDLE GetHandle(const TPMS_CAPABILITY_DATA& capability_data, UINT32 index);
+
 
 }  // namespace trunks
 
