@@ -205,6 +205,7 @@ pub mod trunks {
             response: &CxxString,
             nv_public_data_size: &mut u16,
             nv_name: Pin<&mut CxxString>,
+            nv_public_attributes: &mut u32,
             authorization_delegate: &UniquePtr<AuthorizationDelegate>,
         ) -> u32;
 
