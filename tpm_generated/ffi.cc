@@ -441,6 +441,7 @@ TPM_RC SerializeCommand_NV_ReadPublic(
 TPM_RC ParseResponse_NV_ReadPublic(
     const std::string& response, uint16_t& nv_public_data_size,
     std::string& nv_name,
+    uint32_t& nv_public_attributes,
     const std::unique_ptr<AuthorizationDelegate>& authorization_delegate) {
   TPM2B_NV_PUBLIC nv_public;
   TPM2B_NAME nv_name_typed;
@@ -451,6 +452,7 @@ TPM_RC ParseResponse_NV_ReadPublic(
   }
   nv_public_data_size = nv_public.nv_public.data_size;
   nv_name = StringFrom_TPM2B_NAME(nv_name_typed);
+  nv_public_attributes = nv_public.nv_public.attributes;
   return TPM_RC_SUCCESS;
 }
 
