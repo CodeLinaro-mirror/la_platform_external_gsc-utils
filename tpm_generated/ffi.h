@@ -392,6 +392,11 @@ UINT32 GetHandleCount(const TPMS_CAPABILITY_DATA& capability_data);
 // Returns the handle at a given index in a TPMS_CAPABILITY_DATA.
 TPM_HANDLE GetHandle(const TPMS_CAPABILITY_DATA& capability_data, UINT32 index);
 
+// Returns the maximum number of properties which can be returned in a single TPM call.
+UINT32 GetMaxTpmProperties();
+
+// Populates value with the value of the given property, if it exists. Returns false if not found.
+bool GetProperty(const TPMS_CAPABILITY_DATA& capability_data, TPM_PT property, UINT32& value);
 
 }  // namespace trunks
 

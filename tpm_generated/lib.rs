@@ -29,6 +29,7 @@ pub mod trunks {
         type TPML_PCR_SELECTION;
         type TPMT_TK_CREATION;
         type TPMS_CAPABILITY_DATA;
+        type TPMS_TAGGED_PROPERTY;
 
         include!("ffi.h");
 
@@ -389,6 +390,17 @@ pub mod trunks {
 
         /// Returns the handle at a given index in a TPMS_CAPABILITY_DATA.
         fn GetHandle(capability_data: &TPMS_CAPABILITY_DATA, index: u32) -> u32;
+
+        /// Returns the MAX_TPM_PROPERTIES constant.
+        fn GetMaxTpmProperties() -> u32;
+
+        /// Populates value with the value of hte given property, if it exists.
+        /// Returns false if not found.
+        fn GetProperty(
+            capability_data: &TPMS_CAPABILITY_DATA,
+            property: u32,
+            value: &mut u32,
+        ) -> bool;
     }
 }
 

@@ -736,4 +736,26 @@ TPM_HANDLE GetHandle(const TPMS_CAPABILITY_DATA& capability_data, UINT32 index) 
   return TPM_RH_NULL;
 }
 
+UINT32 GetMaxTpmProperties() {
+  return MAX_TPM_PROPERTIES;
+}
+
+bool GetProperty(const TPMS_CAPABILITY_DATA& capability_data, TPM_PT property, UINT32& value) {
+  if (capability_data.capability != TPM_CAP_TPM_PROPERTIES) {
+    return false;
+  }
+
+  const TPML_TAGGED_TPM_PROPERTY& props = capability_data.data.tpm_properties;
+  UINT32 search_count = std::min((uint32_t)MAX_TPM_PROPERTIES, props.count);
+
+  for (int i = 0; i < search_count; ++i) {
+    const TPMS_TAGGED_PROPERTY& tagged_prop = props.tpm_property[i];
+    if (tagged_prop.property == property) {
+      value = tagged_prop.value;
+      return true;
+    }
+  }
+  return false;
+}
+
 }  // namespace trunks
