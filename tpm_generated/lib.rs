@@ -1,5 +1,5 @@
-// Copyright 2024 The ChromiumOS Authors
-// Use of this source code is governed by a BSD-style license that can be
+// Copyright 2024 The ChromiumOS Authors Use of this source code is governed by a BSD-style license
+// that can be
 // found in the LICENSE file.
 
 //! TPM command encoding/decoding library.
@@ -28,6 +28,8 @@ pub mod trunks {
         type TPMT_SIG_SCHEME;
         type TPML_PCR_SELECTION;
         type TPMT_TK_CREATION;
+        type TPMS_CAPABILITY_DATA;
+        type TPMS_TAGGED_PROPERTY;
 
         include!("ffi.h");
 
@@ -204,6 +206,7 @@ pub mod trunks {
             response: &CxxString,
             nv_public_data_size: &mut u16,
             nv_name: Pin<&mut CxxString>,
+            nv_public_attributes: &mut u32,
             authorization_delegate: &UniquePtr<AuthorizationDelegate>,
         ) -> u32;
 
@@ -303,6 +306,23 @@ pub mod trunks {
             authorization_delegate: Pin<&mut UniquePtr<AuthorizationDelegate>>,
         ) -> u32;
 
+        /// See Tpm::SerializeCommand_GetCapability for docs.
+        fn SerializeCommand_GetCapability(
+            capability: &u32,
+            property: &u32,
+            property_count: &u32,
+            serialized_command: Pin<&mut CxxString>,
+            authorization_delegate: Pin<&mut UniquePtr<AuthorizationDelegate>>,
+        ) -> u32;
+
+        /// See Tpm::ParseResponse_GetCapability for docs.
+        fn ParseResponse_GetCapability(
+            response: &CxxString,
+            more_data: &mut u8,
+            capability_data: Pin<&mut TPMS_CAPABILITY_DATA>,
+            authorization_delegate: Pin<&mut UniquePtr<AuthorizationDelegate>>,
+        ) -> u32;
+
         /// Returns a serialized representation of the unmodified handle. This
         /// is useful for predefined handle values, like TPM_RH_OWNER. For
         /// details on what types of handles use this name formula see Table 3
@@ -354,6 +374,33 @@ pub mod trunks {
 
         /// Makes an empty TPMT_TK_CREATION;
         fn TPMT_TK_CREATION_New() -> UniquePtr<TPMT_TK_CREATION>;
+
+        /// Returns the MAX_CAP_HANDLES constant.
+        fn GetMaxCapHandles() -> u32;
+
+        /// Returns the handle types which reside in TPM volatile memory,
+        /// ie. transient and session handles.
+        fn GetVolatileMemoryHandleTypes() -> [u32; 3];
+
+        /// Creates a new empty TPMS_CAPABILITY_DATA.
+        fn TPMS_CAPABILITY_DATA_New() -> UniquePtr<TPMS_CAPABILITY_DATA>;
+
+        /// Returns the number of handles in a TPMS_CAPABILITY_DATA.
+        fn GetHandleCount(capability_data: &TPMS_CAPABILITY_DATA) -> u32;
+
+        /// Returns the handle at a given index in a TPMS_CAPABILITY_DATA.
+        fn GetHandle(capability_data: &TPMS_CAPABILITY_DATA, index: u32) -> u32;
+
+        /// Returns the MAX_TPM_PROPERTIES constant.
+        fn GetMaxTpmProperties() -> u32;
+
+        /// Populates value with the value of hte given property, if it exists.
+        /// Returns false if not found.
+        fn GetProperty(
+            capability_data: &TPMS_CAPABILITY_DATA,
+            property: u32,
+            value: &mut u32,
+        ) -> bool;
     }
 }
 

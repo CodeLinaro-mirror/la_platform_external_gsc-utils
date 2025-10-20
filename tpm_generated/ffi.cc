@@ -441,6 +441,7 @@ TPM_RC SerializeCommand_NV_ReadPublic(
 TPM_RC ParseResponse_NV_ReadPublic(
     const std::string& response, uint16_t& nv_public_data_size,
     std::string& nv_name,
+    uint32_t& nv_public_attributes,
     const std::unique_ptr<AuthorizationDelegate>& authorization_delegate) {
   TPM2B_NV_PUBLIC nv_public;
   TPM2B_NAME nv_name_typed;
@@ -451,6 +452,7 @@ TPM_RC ParseResponse_NV_ReadPublic(
   }
   nv_public_data_size = nv_public.nv_public.data_size;
   nv_name = StringFrom_TPM2B_NAME(nv_name_typed);
+  nv_public_attributes = nv_public.nv_public.attributes;
   return TPM_RC_SUCCESS;
 }
 
@@ -582,6 +584,24 @@ TPM_RC ParseResponse_FlushContext(
       response, authorization_delegate.get());
 }
 
+TPM_RC SerializeCommand_GetCapability(
+    const TPM_CAP& capability,
+    const UINT32& property,
+    const UINT32& property_count,
+    std::string& serialized_command,
+    std::unique_ptr<AuthorizationDelegate>& authorization_delegate) {
+  return Tpm::SerializeCommand_GetCapability(capability, property, property_count, &serialized_command, authorization_delegate.get());
+}
+
+TPM_RC ParseResponse_GetCapability(
+    const std::string& response,
+    TPMI_YES_NO& more_data,
+    TPMS_CAPABILITY_DATA& capability_data,
+    std::unique_ptr<AuthorizationDelegate>& authorization_delegate) {
+	return Tpm::ParseResponse_GetCapability(
+	    response, &more_data, &capability_data, authorization_delegate.get());
+}
+
 std::unique_ptr<std::string> NameFromHandle(const TPM_HANDLE& handle) {
   std::string name;
   Serialize_TPM_HANDLE(handle, &name);
@@ -687,6 +707,55 @@ std::unique_ptr<TPMT_SIG_SCHEME> Sha256EcdsaSigScheme() {
 
 std::unique_ptr<TPMT_TK_CREATION> TPMT_TK_CREATION_New() {
   return std::make_unique<TPMT_TK_CREATION>();
+}
+
+UINT32 GetMaxCapHandles() {
+  return MAX_CAP_HANDLES;
+}
+
+std::array<UINT32, 3> GetVolatileMemoryHandleTypes() {
+  return {HR_TRANSIENT, HR_HMAC_SESSION, HR_POLICY_SESSION};
+}
+
+std::unique_ptr<TPMS_CAPABILITY_DATA> TPMS_CAPABILITY_DATA_New() {
+  return std::make_unique<TPMS_CAPABILITY_DATA>();
+}
+
+UINT32 GetHandleCount(const TPMS_CAPABILITY_DATA& capability_data) {
+  if (capability_data.capability == TPM_CAP_HANDLES) {
+    return capability_data.data.handles.count;
+  }
+  return 0;
+}
+
+TPM_HANDLE GetHandle(const TPMS_CAPABILITY_DATA& capability_data, UINT32 index) {
+  if (capability_data.capability == TPM_CAP_HANDLES &&
+      index < capability_data.data.handles.count) {
+      return capability_data.data.handles.handle[index];
+  }
+  return TPM_RH_NULL;
+}
+
+UINT32 GetMaxTpmProperties() {
+  return MAX_TPM_PROPERTIES;
+}
+
+bool GetProperty(const TPMS_CAPABILITY_DATA& capability_data, TPM_PT property, UINT32& value) {
+  if (capability_data.capability != TPM_CAP_TPM_PROPERTIES) {
+    return false;
+  }
+
+  const TPML_TAGGED_TPM_PROPERTY& props = capability_data.data.tpm_properties;
+  UINT32 search_count = std::min((uint32_t)MAX_TPM_PROPERTIES, props.count);
+
+  for (int i = 0; i < search_count; ++i) {
+    const TPMS_TAGGED_PROPERTY& tagged_prop = props.tpm_property[i];
+    if (tagged_prop.property == property) {
+      value = tagged_prop.value;
+      return true;
+    }
+  }
+  return false;
 }
 
 }  // namespace trunks
