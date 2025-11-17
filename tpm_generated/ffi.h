@@ -188,6 +188,7 @@ TPM_RC SerializeCommand_NV_ReadPublic(
 TPM_RC ParseResponse_NV_ReadPublic(
     const std::string& response, uint16_t& nv_public_data_size,
     std::string& nv_name,
+    uint32_t& nv_public_attributes,
     const std::unique_ptr<AuthorizationDelegate>& authorization_delegate);
 
 // Wraps Tpm::SerializeCommand_PolicySecret. Serializes a TPM2_PolicySecret
