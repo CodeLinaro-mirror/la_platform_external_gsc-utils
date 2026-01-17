@@ -602,6 +602,24 @@ TPM_RC ParseResponse_GetCapability(
 	    response, &more_data, &capability_data, authorization_delegate.get());
 }
 
+TPM_RC SerializeCommand_NV_Write(
+    const TPMI_RH_NV_AUTH& auth_handle, const std::string& auth_handle_name,
+    const TPMI_RH_NV_INDEX& nv_index, const std::string& nv_index_name,
+    std::string& data, const UINT16& offset, std::string& serialized_command,
+    const std::unique_ptr<AuthorizationDelegate>& authorization_delegate) {
+        const TPM2B_MAX_NV_BUFFER buffer = Make_TPM2B_MAX_NV_BUFFER(data);
+        return Tpm::SerializeCommand_NV_Write(
+            auth_handle, auth_handle_name, nv_index, nv_index_name, buffer, offset,
+            &serialized_command, authorization_delegate.get());
+}
+
+TPM_RC ParseResponse_NV_Write(
+    const std::string& response,
+    const std::unique_ptr<AuthorizationDelegate>& authorization_delegate) {
+        return Tpm::ParseResponse_NV_Write(
+            response, authorization_delegate.get());
+}
+
 std::unique_ptr<std::string> NameFromHandle(const TPM_HANDLE& handle) {
   std::string name;
   Serialize_TPM_HANDLE(handle, &name);

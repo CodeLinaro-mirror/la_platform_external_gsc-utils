@@ -291,6 +291,21 @@ TPM_RC ParseResponse_GetCapability(
     TPMS_CAPABILITY_DATA& capability_data,
     std::unique_ptr<AuthorizationDelegate>& authorization_delegate);
 
+// Wraps Tpm::SerializeCommand_NV_Write. Serializes the TPM2_NV_Write command.
+// authorization_delegate is nullable.
+TPM_RC SerializeCommand_NV_Write(
+    const TPMI_RH_NV_AUTH& auth_handle, const std::string& auth_handle_name,
+    const TPMI_RH_NV_INDEX& nv_index, const std::string& nv_index_name,
+    std::string& data, const UINT16& offset, std::string& serialized_command,
+    const std::unique_ptr<AuthorizationDelegate>& authorization_delegate);
+
+// Wraps Tpm::ParseResponse_NV_Write. Parses the response from a
+// TPM2_NV_Write command.
+// authorization_delegate is nullable.
+TPM_RC ParseResponse_NV_Write(
+    const std::string& response,
+    const std::unique_ptr<AuthorizationDelegate>& authorization_delegate);
+
 // -----------------------------------------------------------------------------
 // TPM_HANDLE
 // -----------------------------------------------------------------------------
