@@ -210,6 +210,24 @@ pub mod trunks {
             authorization_delegate: &UniquePtr<AuthorizationDelegate>,
         ) -> u32;
 
+        /// See Tpm::SerializeCommand_NV_Write for docs.
+        fn SerializeCommand_NV_Write(
+            auth_handle: &u32,
+            auth_handle_name: &CxxString,
+            nv_index: &u32,
+            nv_index_name: &CxxString,
+            data: Pin<&mut CxxString>,
+            offset: &u16,
+            serialized_command: Pin<&mut CxxString>,
+            authorization_delegate: &UniquePtr<AuthorizationDelegate>,
+        ) -> u32;
+
+        /// See Tpm::ParseResponse_NV_Write for docs.
+        fn ParseResponse_NV_Write(
+            response: &CxxString,
+            authorization_delegate: &UniquePtr<AuthorizationDelegate>,
+        ) -> u32;
+
         /// See Tpm::SerializeCommand_PolicySecret for docs.
         fn SerializeCommand_PolicySecret(
             auth_handle: &u32,
