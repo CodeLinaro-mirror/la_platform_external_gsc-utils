@@ -5265,9 +5265,10 @@ static int print_ti50_device_ids(struct ti50_device_ids_response *ids,
 				 bool show_machine_output)
 {
 	size_t i;
-	/* RMA status added in 1.0 */
+	/* RMA status added in 1.1 */
 	bool supports_rma = ids->header.version > 1 ||
-			    ids->header.version != 0xff;
+			    (ids->header.version_minor != 0xff &&
+			     ids->header.version_minor > 0);
 
 	if (ids->header.version == 0xff) {
 		printf("fields unset");
