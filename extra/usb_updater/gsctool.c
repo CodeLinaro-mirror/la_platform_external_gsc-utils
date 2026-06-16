@@ -4385,6 +4385,20 @@ static void process_rma(struct transfer_descriptor *td, const char *authcode,
 			exit(update_error);
 		}
 
+		if (response_size + 1 != sizeof(rma_response)) {
+			fprintf(stderr,
+				"Error in the size of response,"
+				" %zu.\n", response_size);
+			exit(update_error);
+		}
+
+		for (i = 0; i < response_size; i++) {
+			if (!isalnum(((const char *)rma_response)[i])) {
+				fprintf(stderr, "invalid challenge\n");
+				exit(update_error);
+			}
+		}
+
 		if (show_machine_output) {
 			rma_response[response_size] = '\0';
 			print_machine_output("CHALLENGE", "%s", rma_response);
